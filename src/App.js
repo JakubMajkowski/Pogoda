@@ -15,27 +15,35 @@ import './App.scss';
 
 const apiKey = "50012a1be8909cecaf5e2d33e4ff34b4";
 const apiEndpoint = "https://api.openweathermap.org/data/2.5/weather";
-const city = "Gdynia";
 const units = "metric";
 
 function App() {
   const [weatherData, setWeatherData] = useState(null);
+  const [city, setCity] = useState("Gdynia");
+  const [searchCity, setSearchCity] = useState("");
+
+  const handleSearch = () => {
+    if (searchCity) {
+      setCity(searchCity);
+      setSearchCity("");
+    }
+  };
 
   useEffect(() => {
     fetch(`${apiEndpoint}?q=${city}&units=${units}&appid=${apiKey}`)
       .then(response => response.json())
       .then(data => setWeatherData(data))
       .catch(error => console.error("Błąd podczas pobierania danych z API:", error));
-  }, []);
+  }, [city]);
 
   if (!weatherData) {
-    return <div>Loading...</div>;
+    return <div class="loading">Loading...</div>;
   }
 
   const getCurrentDate = () => {
     const now = new Date();
     const day = now.getDate().toString().padStart(2, '0');
-    const month = (now.getMonth() + 1).toString().padStart(2, '0'); // months are zero-based
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
     const year = now.getFullYear();
     return `${day}-${month}-${year}`;
   };
@@ -101,16 +109,25 @@ function App() {
         <p id="temperature">{`${Math.floor(weatherData.main.temp)} °C`}</p>
       </div>
       <div className="additional-info">
-      <p>{`Temp odczuwalna: `}<strong>{`${Math.floor(weatherData.main.feels_like)} °C`}</strong></p>
-      <p>{`Wilgotność: `}<strong>{`${weatherData.main.humidity} %`}</strong></p>
-      <p>{`Ciśnienie: `}<strong>{`${weatherData.main.pressure} hPa`}</strong></p>
-      <p>{`Prędkość wiatru: `}<strong>{`${weatherData.wind.speed} m/s`}</strong></p>
+        <p>{`Temp odczuwalna: `}<strong>{`${Math.floor(weatherData.main.feels_like)} °C`}</strong></p>
+        <p>{`Wilgotność: `}<strong>{`${weatherData.main.humidity} %`}</strong></p>
+        <p>{`Ciśnienie: `}<strong>{`${weatherData.main.pressure} hPa`}</strong></p>
+        <p>{`Prędkość wiatru: `}<strong>{`${weatherData.wind.speed} m/s`}</strong></p>
+      </div>
+      <div className="search-bar">
+          <input
+            type="text"
+            placeholder="Wyszukaj miasto"
+            value={searchCity}
+            onChange={(e) => setSearchCity(e.target.value)}
+          />
+          <button onClick={handleSearch}>Szukaj</button>
+        </div>
+      <div className="footer">
+        <p>Gdynia Merito Jakub Majkowski 66591</p>
+      </div>
     </div>
-    <div className="footer">
-      <p>Gdynia Merito Jakub Majkowski 66591</p>
-    </div>
-  </div>
-);
+  );
 }
 
 export default App;
